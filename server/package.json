@@ -1,0 +1,49 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "MERN Ecommerce Server",
+  "scripts": {
+    "dev": "nodemon",
+    "start": "cross-env NODE_ENV=production nodemon index.js",
+    "seed:db": "node utils/seed.js"
+  },
+  "dependencies": {
+    "@std/esm": "^0.26.0",
+    "aws-sdk": "^2.799.0",
+    "axios": "^0.21.1",
+    "bcryptjs": "^2.4.3",
+    "cloudinary": "^1.41.0",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "dompurify": "^2.3.8",
+    "dotenv": "^8.0.0",
+    "express": "^4.18.2",
+    "express-fileupload": "^1.4.3",
+    "file-type": "^18.7.0",
+    "fs-extra": "^11.2.0",
+    "gridfs-stream": "^1.1.1",
+    "helmet": "^4.6.0",
+    "jsonwebtoken": "^8.5.1",
+    "mailchimp-api-v3": "^1.14.0",
+    "mailgun-js": "^0.22.0",
+    "mongoose": "^5.13.21",
+    "mongoose-slug-generator": "^1.0.4",
+    "multer": "^1.4.4",
+    "nanoid": "^5.0.3",
+    "node-fetch": "^3.3.2",
+    "passport": "^0.4.0",
+    "passport-facebook": "^3.0.0",
+    "passport-google-oauth2": "^0.2.0",
+    "passport-jwt": "^4.0.0",
+    "path": "^0.12.7",
+    "socket.io": "^4.2.0",
+    "stream": "^0.0.2",
+    "validatorjs": "^3.18.1"
+  },
+  "devDependencies": {
+    "chalk": "^2.4.2",
+    "cross-env": "^5.2.1",
+    "nodemon": "^1.19.1"
+  }
+}
