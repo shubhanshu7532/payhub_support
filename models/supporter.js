@@ -6,25 +6,16 @@ const { Schema } = Mongoose;
 
 // User Schema
 const SupportSchema = new Schema({
-    email_id: {
+    emailId: {
         type: String,
-        required: () => {
-            return this.provider !== 'email' ? false : true;
-        }
     },
-    phone: {
-        type: String
-    },
-    first_name: {
-        type: String
-    },
-    last_name: {
+    name: {
         type: String
     },
     password: {
         type: String
     },
-    api_key: {
+    apiKey: {
         type: String
     },
     role: {

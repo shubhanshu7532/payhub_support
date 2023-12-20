@@ -30,9 +30,9 @@ async function generateApiKey(length) {
 router.post('/add', checkAuth, async (req, res) => {
     try {
 
-        const { email_id, phone, first_name, last_name, password } = req.body
+        const { emailId, name, password, apiKey } = req.body
 
-        const email_exist = await Support.findOne({ email_id: email_id })
+        const email_exist = await Support.findOne({ emailId: emailId })
 
         if (email_exist) {
             return res.status(400).json({
@@ -40,37 +40,13 @@ router.post('/add', checkAuth, async (req, res) => {
             });
         }
 
-        const phone_exist = await Support.findOne({ phone: phone })
-
-        if (phone_exist) {
+        if (!name) {
             return res.status(400).json({
-                error: 'phone already exist'
+                error: 'Please enter the name'
             });
         }
 
 
-        if (!first_name) {
-            return res.status(400).json({
-                error: 'Please enter the first name'
-            });
-        }
-
-        if (!last_name) {
-            return res.status(400).json({
-                error: 'Please enter the last name'
-            });
-        }
-
-        let apiKey = await generateApiKey(16);
-
-
-        const existingApiKey = await Support.findOne({ api_key: apiKey });
-
-
-        while (existingApiKey) {
-            apiKey = generateApiKey(16);
-            existingApiKey = await Support.findOne({ api_key: apiKey });
-        }
 
 
         const salt = await bcrypt.genSalt(10);
@@ -81,12 +57,10 @@ router.post('/add', checkAuth, async (req, res) => {
 
 
         const supporter = await Support.create({
-            email_id,
-            phone,
-            first_name,
-            last_name,
+            emailId,
+            name,
             password: user_password,
-            api_key: apiKey,
+            apiKey: apiKey,
             role: "admin"
         })
 
@@ -100,7 +74,8 @@ router.post('/add', checkAuth, async (req, res) => {
 
 
         return res.status(200).json({
-            message: 'support member created successfully'
+            "responseCode": 200,
+            "responseMessage": "Success"
         });
 
     } catch (error) {
@@ -113,32 +88,41 @@ router.post('/add', checkAuth, async (req, res) => {
 
 router.post('/login', async (req, res) => {
     try {
-        const { email_id, password } = req.body;
+        const { emailId, password } = req.body;
 
-        if (!email_id) {
+        if (!emailId) {
             return res
-                .status(400)
-                .json({ error: 'You must enter an email_id address.' });
+                .status(500)
+                .json({
+                    responseCode: 500,
+                    responseMessage: "Please provide me the email",
+                });
         }
 
         if (!password) {
-            return res.status(400).json({ error: 'You must enter a password.' });
+            return res.status(500).json({
+                responseCode: 500,
+                responseMessage: "Please provide me the password",
+            });
         }
 
-        const supporter = await Support.findOne({ email_id });
+        const supporter = await Support.findOne({ emailId });
         if (!supporter) {
             return res
-                .status(400)
-                .send({ error: 'No supporter found for this email_id address.' });
+                .status(500)
+                .send({
+                    responseCode: 500,
+                    responseMessage: "No user found for this email address",
+                });
         }
 
 
         const isMatch = await bcrypt.compare(password, supporter.password);
 
         if (!isMatch) {
-            return res.status(400).json({
-                success: false,
-                error: 'Password Incorrect'
+            return res.status(500).json({
+                responseCode: 500,
+                responseMessage: "Password incorrect",
             });
         }
 
@@ -156,18 +140,19 @@ router.post('/login', async (req, res) => {
 
 
         res.status(200).json({
-            success: true,
-            supporter: {
-                id: supporter.id,
-                firstName: supporter.first_name,
-                lastName: supporter.last_name,
-                email_id: supporter.email_id,
-                role: supporter.role
+            responseCode: 200,
+            responseMessage: "Logged In successfully",
+            responseData: {
+                emailId: supporter.emailId,
+                name: supporter.name
             }
         });
+
+
     } catch (error) {
-        res.status(400).json({
-            error: 'Your request could not be processed. Please try again.'
+        res.status(500).json({
+            responseCode: 500,
+            responseMessage: "Api error",
         });
     }
 });
