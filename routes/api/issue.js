@@ -84,38 +84,23 @@ router.post('/', upload.array('files', 5), async (req, res) => {
 });
 
 // search merchants api
-router.get('/', async (req, res) => {
+router.get('/merchant/query', async (req, res) => {
     try {
-        const { status = "pending", limit = 20, skip = 0 } = req.query;
+        const { limit = 10, skip = 0, status } = req.query
+        const api_key = req.headers.apikey
 
-        let where = {};
-
-        if (status) {
-            if (status === "pending") {
-                where = {
-                    ...where,
-                    assigned_to: null
-                };
-            } else if (status === "rejected" || status === "resolved") {
-                where = {
-                    ...where,
-                    status: status,
-                    assigned_to: req.user.id // Assuming you have user information in req.user
-                };
-            }
-
-            where = {
-                ...where,
-                status: status
-            };
+        const merchant = await Merchant.findOne({ api_key })
+        if (!merchant) {
+            res.status(500).json({
+                responseCode: 500,
+                responseMessage: 'Merchant does not exist'
+            });
         }
+        const queries = await Issue.findAll({})
 
-        const issues = await Issue.find(where)
-            .limit(parseInt(limit, 10))
-            .skip(parseInt(skip, 10))
-            .sort({ createdAt: 'desc' });
 
-        return res.status(200).json(issues);
+
+
     } catch (error) {
         res.status(400).json({
             error: 'Your request could not be processed. Please try again.'

@@ -30,7 +30,7 @@ async function generateApiKey(length) {
 router.post('/add', checkAuth, async (req, res) => {
     try {
 
-        const { emailId, name, password, apiKey } = req.body
+        const { emailId, name, password, apiKey, employedDate } = req.body
 
         const email_exist = await Support.findOne({ emailId: emailId })
 
@@ -61,6 +61,7 @@ router.post('/add', checkAuth, async (req, res) => {
             name,
             password: user_password,
             apiKey: apiKey,
+            employedDate: employedDate || "",
             role: "admin"
         })
 
@@ -106,7 +107,7 @@ router.post('/login', async (req, res) => {
             });
         }
 
-        const supporter = await Support.findOne({ emailId });
+        const supporter = await Support.findOne({ emailId }).select('+password');;
         if (!supporter) {
             return res
                 .status(500)
@@ -148,6 +149,38 @@ router.post('/login', async (req, res) => {
             }
         });
 
+
+    } catch (error) {
+        res.status(500).json({
+            responseCode: 500,
+            responseMessage: "Api error",
+        });
+    }
+});
+
+
+router.get('/', checkAuth, async (req, res) => {
+    try {
+
+        const { limit = 10, skip = 0, search } = req.query;
+
+        // Define the query object based on the search parameter
+        const query = search
+            ? { $or: [{ emailId: new RegExp(search, 'i') }, { name: new RegExp(search, 'i') }] }
+            : {};
+
+        // Retrieve supporters based on the query, limit, and skip
+        const supporters = await Support.find(query)
+            .limit(parseInt(limit))
+            .skip(parseInt(skip));
+
+        console.log(supporters)
+
+        res.status(200).json({
+            responseCode: 200,
+            responseMessage: "Supporters retrieved successfully",
+            responseData: supporters,
+        });
 
     } catch (error) {
         res.status(500).json({
